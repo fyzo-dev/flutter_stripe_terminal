@@ -447,11 +447,13 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin, DiscoveryDelega
     }
     
     public func reader(_ reader: Reader, didStartInstallingUpdate update: ReaderSoftwareUpdate, cancelable: Cancelable?) {
-        
+
     }
     
     public func reader(_ reader: Reader, didReportReaderSoftwareUpdateProgress progress: Float) {
-        
+        var res: Dictionary<String, Float> = Dictionary<String, Float>()
+        res["progress"] = progress
+        methodChannel.invokeMethod("onUpdateInstallProgress", arguments: res)
     }
     
     public func reader(_ reader: Reader, didFinishInstallingUpdate update: ReaderSoftwareUpdate?, error: Error?) {

@@ -18,12 +18,15 @@ class StripeTerminal {
   static const MethodChannel _channel = MethodChannel('stripe_terminal');
   final Future<String> Function() _fetchToken;
 
+  late StreamController<double> _updateStatusStreamController;
+
   /// Creates an internal `StripeTerminal` instance
   StripeTerminal._internal({
     /// A callback function that is supposed to return a
     /// terminal connection token from backend.
     required Future<String> Function() fetchToken,
   }) : _fetchToken = fetchToken {
+    _updateStatusStreamController = StreamController<double>();
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
         case "requestConnectionToken":
@@ -40,6 +43,10 @@ class StripeTerminal {
             readers.map<StripeReader>((e) => StripeReader.fromJson(e)).toList(),
           );
           return _fetchToken();
+        case "onUpdateInstallProgress":
+          double progress = call.arguments["progress"] as double;
+          _updateStatusStreamController.add(progress);
+          break;
         default:
           return null;
       }
@@ -221,6 +228,9 @@ class StripeTerminal {
     };
     return _readerStreamController.stream;
   }
+
+  /// Return the update progress of the current reader.
+  Stream<double> get updateProgress => _updateStatusStreamController.stream;
 
   /// Starts reading payment method based on payment intent.
   ///
