@@ -345,8 +345,13 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                             reader,
                             connectionConfig,
                             object : BluetoothReaderListener {
-
-
+                                override fun onReportReaderSoftwareUpdateProgress(progress: Float) {
+                                    val res: HashMap<String, Float> = HashMap()
+                                    res["progress"] = progress
+                                    currentActivity?.runOnUiThread {
+                                        channel.invokeMethod("onUpdateInstallProgress", res)
+                                    }
+                                }
                             },
                             object : ReaderCallback {
                                 override fun onFailure(e: TerminalException) {
