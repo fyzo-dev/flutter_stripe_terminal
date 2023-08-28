@@ -26,7 +26,7 @@ class StripeTerminal {
     /// terminal connection token from backend.
     required Future<String> Function() fetchToken,
   }) : _fetchToken = fetchToken {
-    _updateStatusStreamController = StreamController<double>();
+    _updateStatusStreamController = StreamController<double>.broadcast();
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
         case "requestConnectionToken":
